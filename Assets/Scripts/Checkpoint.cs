@@ -33,6 +33,7 @@ public class Checkpoint : MonoBehaviour
     // so cant see more than 100m for example
     // for level removing.
 
+    // When player collides with checkpoint, save all game data from that point.
     void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("checkpoint"))
