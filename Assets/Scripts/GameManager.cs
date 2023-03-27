@@ -14,11 +14,14 @@ public class GameManager : MonoBehaviour
     public float _LastPressTime;
     public float _PressDelay = 0.8f;
 
+
+    // Start is a Unity function that executes once, when the script is called.
     void Start()
     {
         EndSceneTransition();
     }
 
+    // Awake is a Unity function that executes before anything else.
     void Awake()
     {
         Screen.orientation = ScreenOrientation.LandscapeLeft;

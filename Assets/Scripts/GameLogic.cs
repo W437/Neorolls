@@ -98,6 +98,7 @@ public class GameLogic : MonoBehaviour
     public float PlayerDistanceStats { get; set; }
     public float PlayerPlaytimeStats { get; set; }
     public int PlayerDeathStats { get; set; }
+    public int PlayerFaults;
 
     // Game states
     public bool GameIsPaused { get; set; } = false;
@@ -129,19 +130,6 @@ public class GameLogic : MonoBehaviour
     // the 3D cube dash
     // but with much better graphics and levels
     // get mtasa mappers to do level design
-
-
-
-    // Checkpoint system:
-    // Checkpoint line > Add trigger, on trigger save player velocity, position, music time. andd any others.
-    // play animation, music pitch down, music pitch in on return.
-    // add to faults.
-    // add ms: to timer.
-
-
-    public int PlayerFaults;
-
-
 
 
     public static GameLogic Instance
@@ -257,7 +245,6 @@ public class GameLogic : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             RestartGame();
 
-        // Ghostmode for Lior
         if (Input.GetKeyUp(KeyCode.G))
             ToggleGhostMode();
 
@@ -332,6 +319,7 @@ public class GameLogic : MonoBehaviour
         GameManager.Instance.GoToScene("MainMenu");
     }
 
+    // Ghostmode removes box colliders from all obstacles. (for testing)
     void ToggleGhostMode()
     {
         if (!_ghostMode)
@@ -357,9 +345,10 @@ public class GameLogic : MonoBehaviour
     public void PlayerAddSpeed(float speed)
     {
         PlayerBallRB.maxAngularVelocity += speed;
-        AddLightIntensity(PlatformFloorLight, 0.0001f);
+        //AddLightIntensity(PlatformFloorLight, 0.0001f);
     }
 
+    // Check if player is grounded (for jumping)
     bool IsGrounded()
     {
         if (Physics.Raycast(PlayerBallRB.position, Vector3.down, _distToGround))
