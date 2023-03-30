@@ -37,7 +37,7 @@ public class GameLogic : MonoBehaviour
     [SerializeField] private GameObject PausedPanelParent;
     [SerializeField] private Button PauseBtn;
     [SerializeField] private Button[] PausedBtns;
-    [SerializeField] private TMPro.TextMeshProUGUI T_Timer;
+    [SerializeField] public TMPro.TextMeshProUGUI T_Timer;
     [SerializeField] private TMPro.TextMeshProUGUI T_Pills;
     [SerializeField] private TMPro.TextMeshProUGUI T_Speed;
     [SerializeField] private TMPro.TextMeshProUGUI T_Faults;
@@ -90,7 +90,8 @@ public class GameLogic : MonoBehaviour
     [Header("")]
     [SerializeField] public AudioSource GameMusic;
     [SerializeField] private Light PlatformFloorLight;
-
+    [SerializeField] public TMPro.TextMeshProUGUI T_LeaderboardEntry;
+    [SerializeField] public GameObject LeaderboardPanel;
 
     // Player stats
     public int PlayerPillsStats { get; set; }
@@ -107,7 +108,7 @@ public class GameLogic : MonoBehaviour
 
     // Timer
     private int TimerMS;
-    private int TimerSeconds;
+    private float TimerSeconds;
     private int TimerMinutes;
     private float _statsMinutes;
     private float _timer;
@@ -149,6 +150,8 @@ public class GameLogic : MonoBehaviour
 
     private void Start()
     {
+
+        LeaderboardManager.Instance.SendLeaderboard("01:42:33");
         // Setting initial UI elements positions before tweening
 
         // Game HUD
@@ -446,11 +449,22 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    public string GetPlayerLevelTimeFinishInString()
+    {
+        return string.Format("{0:00}:{1:00}:{2:00}", TimerMinutes, TimerSeconds, TimerMS);
+    }
+
 
     public void OnGameOver()
     {
         if (!GameIsOver)
         {
+            // Show leaderboard data
+
+            LeaderboardPanel.SetActive(true);
+            LeaderboardManager.Instance.UpdateLeaderboardUI();
+
+
             GameIsOver = true;
             GameManager.Instance.PitchMusic(GameMusic);
             PlayerDistanceStats += PlayerBallRB.position.z / 2000f; // to km?
@@ -522,6 +536,7 @@ public class GameLogic : MonoBehaviour
                         break;
                 }
             }
+
         }
     }
 
@@ -659,8 +674,4 @@ public class GameLogic : MonoBehaviour
         LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
     }
 
-    public string GetPlayerLevelTime()
-    {
-        return T_Timer.text;
-    }
 }
