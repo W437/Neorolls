@@ -14,7 +14,6 @@ public class LeaderboardManager : MonoBehaviour
     void Awake()
     {
         _instance = this;
-        PlayFabSettings.TitleId = "899A3";
         AuthenticateWithPlayFab();
     }
 
@@ -111,7 +110,6 @@ public class LeaderboardManager : MonoBehaviour
 
     public int TimeStringToMilliseconds(string timeString)
     {
-        Debug.Log("Time string: " + timeString);
         string[] parts = timeString.Split(':');
         int minutes = int.Parse(parts[0]);
         int seconds = int.Parse(parts[1]);

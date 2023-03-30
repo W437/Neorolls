@@ -15,7 +15,6 @@ public class PlayerBall : MonoBehaviour
             //GameLogic.Instance.PlayerFaults++;
             GameLogic.Instance.OnGameOver();
             var timeString = GameLogic.Instance.GetPlayerLevelTimeFinishInString();
-            Debug.Log("coll time: " + timeString);
             LeaderboardManager.Instance.SendLeaderboard(timeString);
         }
     }

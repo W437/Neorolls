@@ -138,7 +138,7 @@ public class GameLogic : MonoBehaviour
         get
         {
             if (_instance == null) 
-                Debug.Log("GameManager is null");
+                Debug.Log("GameLogic is null");
             return _instance;
         }
     }
@@ -150,8 +150,6 @@ public class GameLogic : MonoBehaviour
 
     private void Start()
     {
-
-        LeaderboardManager.Instance.SendLeaderboard("01:42:33");
         // Setting initial UI elements positions before tweening
 
         // Game HUD
@@ -662,16 +660,16 @@ public class GameLogic : MonoBehaviour
     }
 
 
-    public void RestartFromCheckpoint()
-    {
-        PlayerBallRB.velocity = Checkpoint.Instance.playerVelocity;
-        PlayerBallRB.maxAngularVelocity = Checkpoint.Instance.playerMaxSpeed;
-        PlayerBall.transform.position = Checkpoint.Instance.playerPosition;
-        GameMusic.time = Checkpoint.Instance.musicTime;
-        PlayerBallRB.isKinematic = false;
-        GameMusic.volume = 0;
-        GameManager.Instance.FadeMusic(GameMusic, false);
-        LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
-    }
+    //public void RestartFromCheckpoint()
+    //{
+    //    PlayerBallRB.velocity = Checkpoint.Instance.playerVelocity;
+    //    PlayerBallRB.maxAngularVelocity = Checkpoint.Instance.playerMaxSpeed;
+    //    PlayerBall.transform.position = Checkpoint.Instance.playerPosition;
+    //    GameMusic.time = Checkpoint.Instance.musicTime;
+    //    PlayerBallRB.isKinematic = false;
+    //    GameMusic.volume = 0;
+    //    GameManager.Instance.FadeMusic(GameMusic, false);
+    //    LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
+    //}
 
 }

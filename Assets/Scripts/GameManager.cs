@@ -112,7 +112,9 @@ public class GameManager : MonoBehaviour
     public void FadeGameMusicTo(float to)
     {
         var _music = GameLogic.Instance.GameMusic;
-        if(_music)
+        if (_music)
+            if (!_music.isPlaying)
+                _music.Play();
             LeanTween.value(_music.volume, to, .5f).setOnUpdate((float val) => { _music.volume = val; });
     }
 

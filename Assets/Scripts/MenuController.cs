@@ -33,6 +33,8 @@ public class MenuController : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI PlaytimeText;
     [SerializeField] private TMPro.TextMeshProUGUI TotalPointsText;
 
+    [SerializeField] private TMPro.TextMeshProUGUI T_LeaderboardEntry;
+
     private void Awake()
     {
         _instance = this;
@@ -136,6 +138,9 @@ public class MenuController : MonoBehaviour
         if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay *0.75 > Time.unscaledTime)
             return;
         GameManager.Instance._LastPressTime = Time.unscaledTime;
+
+
+        LeaderboardManager.Instance.UpdateLeaderboardUI();
 
         LoadPlayerStats();
         if (!StatsView.activeSelf)
