@@ -11,8 +11,10 @@ public class PlayerBall : MonoBehaviour
             GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = 0;
             GameLogic.Instance.PausePlayerMovement();  
             Debug.Log("Collision: " + col);
-            GameLogic.Instance.RestartFromCheckpoint();
-            GameLogic.Instance.PlayerFaults++;
+            //GameLogic.Instance.RestartFromCheckpoint();
+            //GameLogic.Instance.PlayerFaults++;
+            GameLogic.Instance.OnGameOver();
+            LeaderboardManager.Instance.SendLeaderboard(1231);
         }
     }
 }

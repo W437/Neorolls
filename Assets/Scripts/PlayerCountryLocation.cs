@@ -3,42 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
-public class Locating : MonoBehaviour
+public class PlayerCountryLocation : MonoBehaviour
 {
-    [SerializeField] Text textState;
-    [SerializeField] Text textContinent;
-    [SerializeField] Text textCountry;
-    [SerializeField] Text textCity;
 
+    public static string PlayerCountryCode = "";
     void Start()
     {
-        textState.text = "";
         StartCoroutine("DetectCountry");
     }
 
+    [System.Obsolete]
     IEnumerator DetectCountry()
     {
         UnityWebRequest request = UnityWebRequest.Get("https://extreme-ip-lookup.com/json");
         request.chunkedTransfer = false;
         yield return request.Send();
-        textState.text = "Locating...";
+        Debug.Log("Locating");
 
-        if (request.isError)
+        if (request.isNetworkError)
         {
-            textState.text = "error : " + request.error;
+            Debug.Log("error : " + request.error);
         }
         else
         {
             if (request.isDone)
             {
                 Country res = JsonUtility.FromJson<Country>(request.downloadHandler.text);
-                textState.text = "";
-                textContinent.text = res.continent;
-                textCity.text = res.city;
-                textCountry.text = res.country;
+                PlayerCountryCode = res.countryCode;
             }
         }
+    }
+
+    public static string GetPlayerCountryCode()
+    {
+        return PlayerCountryCode;
     }
 }

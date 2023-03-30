@@ -658,4 +658,9 @@ public class GameLogic : MonoBehaviour
         GameManager.Instance.FadeMusic(GameMusic, false);
         LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
     }
+
+    public string GetPlayerLevelTime()
+    {
+        return T_Timer.text;
+    }
 }
