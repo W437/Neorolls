@@ -14,7 +14,6 @@ public class AndroidAgent : IronSourceIAgent
 
 	public AndroidAgent ()
 	{
-		Debug.Log ("AndroidAgent ctr");
 		initEventsDispatcher();
 	}
 	
@@ -45,11 +44,6 @@ public class AndroidAgent : IronSourceIAgent
 		{                   
 			getBridge ().Call ("onResume");
 		}
-	}
-
-	public void setMediationSegment (string segment)
-	{
-		getBridge ().Call ("setMediationSegment", segment);
 	}
 
 	public string getAdvertiserId ()
@@ -89,7 +83,6 @@ public class AndroidAgent : IronSourceIAgent
 
 	public int? getConversionValue()
     {
-		Debug.Log("Unsupported Platform");
 		return null;
 	}
 
@@ -317,12 +310,10 @@ public class AndroidAgent : IronSourceIAgent
 
 	public void loadConsentViewWithType(string consentViewType)
 	{
-		Debug.Log("Unsupported Platform");
 	}
 
 	public void showConsentViewWithType(string consentViewType)
 	{
-		Debug.Log("Unsupported Platform");
 	}
 
 	//******************* ILRD API *******************//
@@ -331,6 +322,14 @@ public class AndroidAgent : IronSourceIAgent
 	{
 		string json = IronSourceJSON.Json.Serialize(impressionData);
 		getBridge().Call("setAdRevenueData", dataSource, json);
+	}
+
+	//******************* TestSuite API *******************//
+
+	public void launchTestSuite()
+	{
+		Debug.Log("AndroidAgent: launching TestSuite");
+		getBridge().Call("launchTestSuite");
 	}
 
 #endregion

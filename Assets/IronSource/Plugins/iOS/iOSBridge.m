@@ -107,10 +107,6 @@ char *const IRONSOURCE_BANNER_EVENTS = "IronSourceBannerEvents";
 
 #pragma mark Base API
 
-- (void)setMediationSegment:(NSString *)segment {
-    [IronSource setMediationSegment:segment];
-}
-
 - (const char *)getAdvertiserId {
     NSString *advertiserId = [IronSource advertiserId];
     
@@ -992,6 +988,11 @@ char *const IRONSOURCE_BANNER_EVENTS = "IronSourceBannerEvents";
     [IronSource setAdRevenueDataWithDataSource:dataSource impressionData:impressionData];
 }
 
+#pragma mark TestSuite API
+- (void)launchTestSuite {
+    [IronSource launchTestSuite:[UIApplication sharedApplication].keyWindow.rootViewController];
+}
+
 #pragma mark - C Section
 
 #ifdef __cplusplus
@@ -1007,11 +1008,6 @@ extern "C" {
     
     void CFSetPluginData(const char *pluginType, const char *pluginVersion, const char *pluginFrameworkVersion){
         [[iOSBridge start] setPluginDataWithType:GetStringParam(pluginType) pluginVersion:GetStringParam(pluginVersion) pluginFrameworkVersion:GetStringParam(pluginFrameworkVersion)];
-    }
-    
-    
-    void CFSetMediationSegment(const char *segment){
-        [[iOSBridge start] setMediationSegment:GetStringParam(segment)];
     }
     
     const char *CFGetAdvertiserId(){
@@ -1266,8 +1262,12 @@ extern "C" {
         }
         return [[iOSBridge start] setAdRevenueData:GetStringParam(datasource)impressionData:data];
     }
-    
-    
+
+#pragma mark TestSuite API
+    void CFLaunchTestSuite(){
+        [[iOSBridge start] launchTestSuite];
+    }
+
 #pragma mark - ISRewardedVideoManualDelegate methods
     
     

@@ -33,7 +33,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI PlaytimeText;
     [SerializeField] private TMPro.TextMeshProUGUI TotalPointsText;
 
-    [SerializeField] private TMPro.TextMeshProUGUI T_LeaderboardEntry;
+    [SerializeField] public TMPro.TextMeshProUGUI T_LeaderboardEntry;
 
     private void Awake()
     {

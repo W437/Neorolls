@@ -139,7 +139,10 @@ public class LeaderboardManager : MonoBehaviour
         PlayFabClientAPI.GetLeaderboard(request, result =>
         {
             // Clear the leaderboard UI
-            GameLogic.Instance.T_LeaderboardEntry.text = "";
+            if (!GameLogic.Instance)
+                MenuController.Instance.T_LeaderboardEntry.text = "";
+            else
+                GameLogic.Instance.T_LeaderboardEntry.text = "";
 
             // Loop through the leaderboard data and add it to the UI
             foreach (var item in result.Leaderboard)
@@ -153,7 +156,10 @@ public class LeaderboardManager : MonoBehaviour
 
                 int rank = 1;
                 // Add the player data to the leaderboard UI
-                GameLogic.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
+                if (!GameLogic.Instance)
+                    MenuController.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
+                else
+                    GameLogic.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
             }
         }, error =>
         {

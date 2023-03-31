@@ -1,8 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-public class IronSourceMediatedNetworkSettings : ScriptableObject
-{
+public class IronSourceMediatedNetworkSettings : ScriptableObject{
     public static readonly string MEDIATION_SETTINGS_ASSET_PATH = Path.Combine(IronSourceConstants.IRONSOURCE_RESOURCES_PATH, IronSourceConstants.IRONSOURCE_MEDIATED_NETWORK_SETTING_NAME + ".asset");
 
     [Header("")]

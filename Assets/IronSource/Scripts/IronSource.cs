@@ -7,7 +7,7 @@ public class IronSource : IronSourceIAgent
 {
 	private IronSourceIAgent _platformAgent;
 	private static IronSource _instance;
-	public static string UNITY_PLUGIN_VERSION = "7.2.5.2-r";
+	public static string UNITY_PLUGIN_VERSION = "7.3.0.1-r";
 	private static bool isUnsupportedPlatform;
 
 	private IronSource()
@@ -70,12 +70,6 @@ public class IronSource : IronSourceIAgent
 	public void onApplicationPause(bool pause)
 	{
 		_platformAgent.onApplicationPause(pause);
-	}
-
-	[Obsolete("This method has been deprecated and won’t be included in ironSource SDK versions 7.3.0 and above", false)]
-	public void setMediationSegment(string segment)
-	{
-		_platformAgent.setMediationSegment(segment);
 	}
 
 	public string getAdvertiserId()
@@ -150,17 +144,13 @@ public class IronSource : IronSourceIAgent
 		_platformAgent.init(appKey, adUnits);
 	}
 
-	public void initISDemandOnly(string appKey, params string[] adUnits)
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public void initISDemandOnly(string appKey, params string[] adUnits)
 	{
 		_platformAgent.initISDemandOnly(appKey, adUnits);
 	}
 
 	//******************* RewardedVideo API *******************//
-	[Obsolete("This method has been deprecated and won’t be included in ironSource SDK versions 7.3.0 and above. Please use loadRewardedVideo() instead", false)]
-	public void loadManualRewardedVideo()
-	{
-		_platformAgent.loadRewardedVideo();
-	}
 
 	public void loadRewardedVideo()
 	{
@@ -203,19 +193,19 @@ public class IronSource : IronSourceIAgent
 		_platformAgent.clearRewardedVideoServerParams();
 	}
 
-	//******************* RewardedVideo DemandOnly API *******************//
-
-	public void showISDemandOnlyRewardedVideo(string instanceId)
+    //******************* RewardedVideo DemandOnly API *******************//
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public void showISDemandOnlyRewardedVideo(string instanceId)
 	{
 		_platformAgent.showISDemandOnlyRewardedVideo(instanceId);
 	}
-
-	public void loadISDemandOnlyRewardedVideo(string instanceId)
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public void loadISDemandOnlyRewardedVideo(string instanceId)
 	{
 		_platformAgent.loadISDemandOnlyRewardedVideo(instanceId);
 	}
-
-	public bool isISDemandOnlyRewardedVideoAvailable(string instanceId)
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public bool isISDemandOnlyRewardedVideoAvailable(string instanceId)
 	{
 		return _platformAgent.isISDemandOnlyRewardedVideoAvailable(instanceId);
 	}
@@ -247,19 +237,19 @@ public class IronSource : IronSourceIAgent
 		return _platformAgent.isInterstitialPlacementCapped(placementName);
 	}
 
-	//******************* Interstitial DemandOnly API *******************//
-
-	public void loadISDemandOnlyInterstitial(string instanceId)
+    //******************* Interstitial DemandOnly API *******************//
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public void loadISDemandOnlyInterstitial(string instanceId)
 	{
 		_platformAgent.loadISDemandOnlyInterstitial(instanceId);
 	}
-
-	public void showISDemandOnlyInterstitial(string instanceId)
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public void showISDemandOnlyInterstitial(string instanceId)
 	{
 		_platformAgent.showISDemandOnlyInterstitial(instanceId);
 	}
-
-	public bool isISDemandOnlyInterstitialReady(string instanceId)
+    [Obsolete("This API has been deprecated as of SDK 7.3.0.1", false)]
+    public bool isISDemandOnlyInterstitialReady(string instanceId)
 	{
 		return _platformAgent.isISDemandOnlyInterstitialReady(instanceId);
 	}
@@ -347,6 +337,13 @@ public class IronSource : IronSourceIAgent
 	public void setAdRevenueData(string dataSource, Dictionary<string, string> impressionData)
 	{
 		_platformAgent.setAdRevenueData(dataSource, impressionData);
+	}
+
+	//******************* TestSuite API *******************//
+
+	public void launchTestSuite()
+	{
+		_platformAgent.launchTestSuite();
 	}
 
 	#endregion
