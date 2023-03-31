@@ -144,6 +144,11 @@ public class LeaderboardManager : MonoBehaviour
             else
                 GameLogic.Instance.T_LeaderboardEntry.text = "";
 
+            // Ascending to Descending order
+            result.Leaderboard.Reverse();
+
+            int rank = 1;
+
             // Loop through the leaderboard data and add it to the UI
             foreach (var item in result.Leaderboard)
             {
@@ -154,7 +159,6 @@ public class LeaderboardManager : MonoBehaviour
                 // Convert the score to the desired format, such as minutes and seconds
                 string scoreString = FormatScore(playerScore);
 
-                int rank = 1;
                 // Add the player data to the leaderboard UI
                 if (!GameLogic.Instance)
                     MenuController.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
@@ -174,6 +178,11 @@ public class LeaderboardManager : MonoBehaviour
         return string.Format("{0:D2}:{1:D2}:{2:D3}", time.Minutes, time.Seconds, time.Milliseconds);
     }
 
+
+    private string GetFlagIconUrl(string countryCode)
+    {
+        return "https://flagicons.lipis.dev/flags/4x3/" + countryCode + "/.svg";
+    }
 
     //  PLAYFAB: INT TIME IN SECONDS
     //  Convert player time string to milliseconds (int)
