@@ -159,11 +159,13 @@ public class LeaderboardManager : MonoBehaviour
                 // Convert the score to the desired format, such as minutes and seconds
                 string scoreString = FormatScore(playerScore);
 
+                Sprite flagSprite = Resources.Load<Sprite>("Flags/" + country);
                 // Add the player data to the leaderboard UI
                 if (!GameLogic.Instance)
-                    MenuController.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
+                    MenuController.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - <sprite name=\"{3}\">\n", rank++, playerName, scoreString, country);
                 else
                     GameLogic.Instance.T_LeaderboardEntry.text += string.Format("{0}. {1} ({2}) - {3}\n", rank++, playerName, scoreString, country);
+                //GameLogic.Instance.T_LeaderboardEntry.transform.GetChild(0).GetComponent<Image>().sprite = flagSprite;
             }
         }, error =>
         {
@@ -181,7 +183,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private string GetFlagIconUrl(string countryCode)
     {
-        return "https://flagicons.lipis.dev/flags/4x3/" + countryCode + "/.svg";
+        return "https://flagicons.lipis.dev/flags/4x3/" + countryCode.ToLower() + "/.svg";
     }
 
     //  PLAYFAB: INT TIME IN SECONDS
