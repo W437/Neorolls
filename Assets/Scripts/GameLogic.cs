@@ -37,7 +37,7 @@ public class GameLogic : MonoBehaviour
     [SerializeField] private GameObject PausedPanelParent;
     [SerializeField] private Button PauseBtn;
     [SerializeField] private Button[] PausedBtns;
-    [SerializeField] private TMPro.TextMeshProUGUI T_Timer;
+    [SerializeField] public TMPro.TextMeshProUGUI T_Timer;
     [SerializeField] private TMPro.TextMeshProUGUI T_Pills;
     [SerializeField] private TMPro.TextMeshProUGUI T_Speed;
     [SerializeField] private TMPro.TextMeshProUGUI T_Faults;
@@ -90,7 +90,8 @@ public class GameLogic : MonoBehaviour
     [Header("")]
     [SerializeField] public AudioSource GameMusic;
     [SerializeField] private Light PlatformFloorLight;
-
+    [SerializeField] public TMPro.TextMeshProUGUI T_LeaderboardEntry;
+    [SerializeField] public GameObject LeaderboardPanel;
 
     // Player stats
     public int PlayerPillsStats { get; set; }
@@ -107,7 +108,7 @@ public class GameLogic : MonoBehaviour
 
     // Timer
     private int TimerMS;
-    private int TimerSeconds;
+    private float TimerSeconds;
     private int TimerMinutes;
     private float _statsMinutes;
     private float _timer;
@@ -137,7 +138,7 @@ public class GameLogic : MonoBehaviour
         get
         {
             if (_instance == null) 
-                Debug.Log("GameManager is null");
+                Debug.Log("GameLogic is null");
             return _instance;
         }
     }
@@ -446,11 +447,22 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    public string GetPlayerLevelTimeFinishInString()
+    {
+        return string.Format("{0:00}:{1:00}:{2:00}", TimerMinutes, TimerSeconds, TimerMS);
+    }
+
 
     public void OnGameOver()
     {
         if (!GameIsOver)
         {
+            // Show leaderboard data
+
+            LeaderboardPanel.SetActive(true);
+            LeaderboardManager.Instance.UpdateLeaderboardUI();
+
+
             GameIsOver = true;
             GameManager.Instance.PitchMusic(GameMusic);
             PlayerDistanceStats += PlayerBallRB.position.z / 2000f; // to km?
@@ -522,6 +534,7 @@ public class GameLogic : MonoBehaviour
                         break;
                 }
             }
+
         }
     }
 
@@ -647,15 +660,16 @@ public class GameLogic : MonoBehaviour
     }
 
 
-    public void RestartFromCheckpoint()
-    {
-        PlayerBallRB.velocity = Checkpoint.Instance.playerVelocity;
-        PlayerBallRB.maxAngularVelocity = Checkpoint.Instance.playerMaxSpeed;
-        PlayerBall.transform.position = Checkpoint.Instance.playerPosition;
-        GameMusic.time = Checkpoint.Instance.musicTime;
-        PlayerBallRB.isKinematic = false;
-        GameMusic.volume = 0;
-        GameManager.Instance.FadeMusic(GameMusic, false);
-        LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
-    }
+    //public void RestartFromCheckpoint()
+    //{
+    //    PlayerBallRB.velocity = Checkpoint.Instance.playerVelocity;
+    //    PlayerBallRB.maxAngularVelocity = Checkpoint.Instance.playerMaxSpeed;
+    //    PlayerBall.transform.position = Checkpoint.Instance.playerPosition;
+    //    GameMusic.time = Checkpoint.Instance.musicTime;
+    //    PlayerBallRB.isKinematic = false;
+    //    GameMusic.volume = 0;
+    //    GameManager.Instance.FadeMusic(GameMusic, false);
+    //    LeanTween.value(0, 0.1f, 1f).setOnUpdate((float val) => { GameLogic.Instance.PlayerBall.GetComponentInChildren<TrailRenderer>().time = val; });
+    //}
+
 }
