@@ -13,8 +13,10 @@ public class MenuController : MonoBehaviour
     [SerializeField] private Button AboutButton;
     [SerializeField] private Button SettingsBackBtn;
     [SerializeField] private Button AboutBackBtn;
+    [SerializeField] private Button LeaderboardBackBtn;
     [SerializeField] private Button StatsBtn;
-    [SerializeField] private Button QuitGameBtn;
+    [SerializeField] private Button LeaderboardBtn;
+    //[SerializeField] private Button QuitGameBtn; for desktop
     [SerializeField] private Button DeletePlayerDataBtn;
     [SerializeField] private GameObject MenuView;
     [SerializeField] private GameObject SettingsView;
@@ -33,6 +35,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI PlaytimeText;
     [SerializeField] private TMPro.TextMeshProUGUI TotalPointsText;
 
+    [SerializeField] public GameObject LeaderboardView;
     [SerializeField] public TMPro.TextMeshProUGUI T_LeaderboardEntry;
 
     private void Awake()
@@ -42,6 +45,10 @@ public class MenuController : MonoBehaviour
 
     void Start()
     {
+        // Set initial Leaderboard position
+        LeaderboardView.transform.localScale = new Vector3(0, 0, 0);
+
+
         // Load Settings
         if (PlayerPrefs.GetInt("MenuMusicToggle", 1) == 0)
         {
@@ -62,10 +69,12 @@ public class MenuController : MonoBehaviour
         AboutButton.onClick.AddListener(delegate{ OnMainMenuButtonClick(AboutView); });
         SettingsBackBtn.onClick.AddListener(delegate{ OnBackButtonClick(SettingsView); });
         AboutBackBtn.onClick.AddListener(delegate{ OnBackButtonClick(AboutView); });
-        StatsBtn.onClick.AddListener( OnStatsButtonClick );
+        LeaderboardBtn.onClick.AddListener(delegate { OnMainMenuButtonClick(LeaderboardView); });
+        LeaderboardBackBtn.onClick.AddListener(delegate { OnBackButtonClick(LeaderboardView); });
+        StatsBtn.onClick.AddListener( OnLeaderboardBtnClick );
         PlayButton.onClick.AddListener(delegate { GameManager.Instance.GoToScene("MainGame"); GameManager.Instance.FadeMusic(MenuAudio, true); });
         DeletePlayerDataBtn.onClick.AddListener(DeletePlayerData);
-        QuitGameBtn.onClick.AddListener(Application.Quit);
+        //QuitGameBtn.onClick.AddListener(Application.Quit);
 
         // Play button animation
         LeanTween.scale(PlayButton.gameObject, new Vector3(0.54f, 0.5f, 0.5f), 1.0f).setEase(LeanTweenType.easeOutElastic).
@@ -105,19 +114,23 @@ public class MenuController : MonoBehaviour
         if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay > Time.unscaledTime)
             return;
 
+        LeaderboardManager.Instance.UpdateLeaderboardUI();
+
         LeanTween.scale(LogoGO, new Vector3(0.4f, 0.4f, 0.4f), 1.0f).setEase(LeanTweenType.easeOutElastic);
         LeanTween.moveY(LogoGO.GetComponent<RectTransform>(), -30f, 1.0f).setEase(LeanTweenType.easeOutElastic);
 
-        if (StatsView.activeSelf)
-            OnStatsButtonClick();
 
         GameManager.Instance._LastPressTime = Time.unscaledTime;
         objView.SetActive(true);
-        LeanTween.scale(objView, new Vector3(1, 1, 1), 1.0f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
+        LeanTween.scale(objView, new Vector3(1, 1, 1), 1.0f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f).setOnComplete(
+            delegate ()
+            {
+               
+            });
         LeanTween.scale(MenuView, new Vector3(0, 0, 0), 1.0f).setEase(LeanTweenType.easeOutElastic).setDelay(0.1f);
         StartCoroutine(ViewActiveToggle(MenuView));
     }
-
+      
     void OnBackButtonClick(GameObject objView)
     {
         if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay > Time.unscaledTime)
@@ -133,27 +146,27 @@ public class MenuController : MonoBehaviour
         StartCoroutine(ViewActiveToggle(objView));
     }
 
-    void OnStatsButtonClick()
+    void OnLeaderboardBtnClick()
     {
-        if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay *0.75 > Time.unscaledTime)
+        if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay > Time.unscaledTime)
             return;
         GameManager.Instance._LastPressTime = Time.unscaledTime;
 
-
         LeaderboardManager.Instance.UpdateLeaderboardUI();
+        //Leaderboard.SetActive(true);
 
         LoadPlayerStats();
-        if (!StatsView.activeSelf)
+        if (!LeaderboardView.activeSelf)
         {
-            StatsView.SetActive(true);
-            LeanTween.moveX(StatsView.gameObject.GetComponent<RectTransform>(), -112f, 0.5f).setEase(LeanTweenType.easeInOutSine);
+            LeaderboardView.SetActive(true);
+            LeanTween.scale(LeaderboardView.gameObject.GetComponent<RectTransform>(), new Vector3(1, 1, 1), 0.2f).setEase(LeanTweenType.clamp);
         }
         else
         {
-            LeanTween.moveX(StatsView.gameObject.GetComponent<RectTransform>(), 125f, 0.5f).setEase(LeanTweenType.easeInOutBack).setOnComplete(
+            LeanTween.scale(LeaderboardView.gameObject.GetComponent<RectTransform>(), new Vector3(0,0,0), 0.5f).setEase(LeanTweenType.easeInBack).setOnComplete(
                 delegate ()
                 {
-                    StatsView.SetActive(false);
+                    LeaderboardView.SetActive(false);
                 });
         }
     }
