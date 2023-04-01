@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using PlayFab.EconomyModels;
 using UnityEngine.SocialPlatforms.Impl;
+using System.Drawing;
 
 public class LeaderboardManager : MonoBehaviour
 { 
@@ -127,7 +128,7 @@ public class LeaderboardManager : MonoBehaviour
         {
             StatisticName = "LEVEL1_TIMES",
             StartPosition = 0,
-            MaxResultsCount = 10
+            MaxResultsCount = 100
         };
 
         PlayFabClientAPI.GetLeaderboard(request, result =>
@@ -149,15 +150,11 @@ public class LeaderboardManager : MonoBehaviour
                 var lbEntryBarObject = Instantiate(LB_EntryBar, LB_EntryParent);
 
                 // Set the position and size of the LB_Entry Bar object
-                var barRectTransform = lbEntryBarObject.GetComponent<RectTransform>();
-                barRectTransform.anchoredPosition = new Vector2(originalPos.x, yPos);
-                yPos -= lbEntryHeight;
+                //var barRectTransform = lbEntryBarObject.GetComponent<RectTransform>();
+                //barRectTransform.anchoredPosition = new Vector2(originalPos.x, yPos);
+                //yPos -= lbEntryHeight;
 
                 // Set the text of the LB_Entry Text object
-                var lbEntryText = lbEntryBarObject.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                lbEntryText.text = string.Format("{0}. {1} ({2}) - {3}", rank, TruncateString(item.DisplayName, 10), FormatScore((int)item.StatValue), "US");
-
-                rank++;
 
                 string playerName = TruncateString(item.DisplayName, 10);
                 int playerScore = (int)item.StatValue;
@@ -165,6 +162,11 @@ public class LeaderboardManager : MonoBehaviour
 
                 // Convert the score to the desired format 
                 string scoreString = FormatScore(playerScore);
+
+                var lbEntryText = lbEntryBarObject.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                lbEntryText.text = string.Format("<color=#fff000>{0}.</color> {1} (<color=#fff123>{2}</color>) - {3}", rank, playerName, scoreString, country);
+
+                rank++;
             }
         }, error =>
         {
