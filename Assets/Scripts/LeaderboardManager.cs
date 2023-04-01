@@ -149,13 +149,6 @@ public class LeaderboardManager : MonoBehaviour
             {
                 var lbEntryBarObject = Instantiate(LB_EntryBar, LB_EntryParent);
 
-                // Set the position and size of the LB_Entry Bar object
-                //var barRectTransform = lbEntryBarObject.GetComponent<RectTransform>();
-                //barRectTransform.anchoredPosition = new Vector2(originalPos.x, yPos);
-                //yPos -= lbEntryHeight;
-
-                // Set the text of the LB_Entry Text object
-
                 string playerName = TruncateString(item.DisplayName, 10);
                 int playerScore = (int)item.StatValue;
                 string country = "US"; // Automate
