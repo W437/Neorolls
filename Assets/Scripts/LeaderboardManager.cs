@@ -13,13 +13,13 @@ public class LeaderboardManager : MonoBehaviour
     private static LeaderboardManager _instance;
     [SerializeField] private GameObject LB_EntryBar;
     [SerializeField] private Transform LB_EntryParent;
-    private TMPro.TextMeshProUGUI LB_EntryText;
 
+    [SerializeField] private int MaxPlayerNameLength = 11;
     void Awake()
     {
         _instance = this;
         AuthenticateWithPlayFab();
-        LB_EntryText = LB_EntryBar.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        //LB_EntryText = LB_EntryBar.GetComponentInChildren<TMPro.TextMeshProUGUI>();
     }
 
 
@@ -133,23 +133,17 @@ public class LeaderboardManager : MonoBehaviour
 
         PlayFabClientAPI.GetLeaderboard(request, result =>
         {
-            //LB_EntryText.text = "";
-
             // Ascending to Descending order (because PlayFab doesn't provide order setting)
             result.Leaderboard.Reverse();
 
             int rank = 1;
-
-            var originalPos = new Vector3(0, 90.8f, 0);
-            var lbEntryHeight = LB_EntryBar.GetComponent<RectTransform>().rect.height + 3f;
-            var yPos = originalPos.y;
 
             // Loop through the leaderboard data and add it to the UI
             foreach (var item in result.Leaderboard)
             {
                 var lbEntryBarObject = Instantiate(LB_EntryBar, LB_EntryParent);
 
-                string playerName = TruncateString(item.DisplayName, 10);
+                string playerName = TruncateString(item.DisplayName);
                 int playerScore = (int)item.StatValue;
                 string country = "US"; // Automate
 
@@ -195,11 +189,13 @@ public class LeaderboardManager : MonoBehaviour
     public int TimeStringToMilliseconds(string timeString)
     {
         string[] parts = timeString.Split(':');
+
         int minutes = int.Parse(parts[0]);
         int seconds = int.Parse(parts[1]);
-        int milliseconds = int.Parse(parts[2]);
-        
+        int milliseconds = int.Parse(parts[2]);  
+
         int totalMilliseconds = (minutes * 60 * 1000) + (seconds * 1000) + milliseconds;
+
         return totalMilliseconds;
     }
 
@@ -211,10 +207,10 @@ public class LeaderboardManager : MonoBehaviour
     }
 
 
-    private string TruncateString(string str, int maxLength)
+    private string TruncateString(string str)
     {
-        if (str.Length > maxLength)
-            return str.Substring(0, maxLength - 3) + "...";
+        if (str.Length > MaxPlayerNameLength)
+            return str.Substring(0, MaxPlayerNameLength - 2) + "..";
         else
             return str;
     }
