@@ -447,7 +447,7 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public string GetPlayerLevelTimeFinishInString()
+    public string GetLevelFinishTimeInString()
     {
         return string.Format("{0:00}:{1:00}:{2:00}", TimerMinutes, TimerSeconds, TimerMS);
     }
@@ -460,8 +460,6 @@ public class GameLogic : MonoBehaviour
             // Show leaderboard data
 
             LeaderboardPanel.SetActive(true);
-            LeaderboardManager.Instance.UpdateLeaderboardUI();
-
 
             GameIsOver = true;
             GameManager.Instance.PitchMusic(GameMusic);

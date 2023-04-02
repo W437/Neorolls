@@ -9,6 +9,7 @@ public class FinishLine : MonoBehaviour
     private bool _finishThreshold = false;
     private bool _fadeThreshold = false;
     private float DistanceFromPlayer;
+    private bool collided = false;
 
 
 
@@ -59,7 +60,14 @@ public class FinishLine : MonoBehaviour
     {
         if (col.CompareTag("Player"))
         { 
-            GameLogic.Instance.OnLevelFinish();
+            if(!collided) 
+            {
+                GameLogic.Instance.OnLevelFinish();
+                var timeString = GameLogic.Instance.GetLevelFinishTimeInString();
+                LeaderboardManager.Instance.SendLeaderboard(timeString);
+                collided = true;            
+            }
         }
     }
+
 }

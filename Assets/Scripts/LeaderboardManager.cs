@@ -2,24 +2,33 @@ using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
 using System.Collections.Generic;
-using System.Linq;
-using System;
 using PlayFab.EconomyModels;
-using UnityEngine.SocialPlatforms.Impl;
-using System.Drawing;
+using UnityEngine.UI;
+using Image = UnityEngine.UI.Image;
+using System;
 
 public class LeaderboardManager : MonoBehaviour
 { 
     private static LeaderboardManager _instance;
     [SerializeField] private GameObject LB_EntryBar;
     [SerializeField] private Transform LB_EntryParent;
-
+    [SerializeField] private Button LB_RefreshBtn;
+    [SerializeField] public GameObject PlayerNameInputWindow;
+    [SerializeField] private TMPro.TextMeshProUGUI PlayerNameInput;
     [SerializeField] private int MaxPlayerNameLength = 11;
+    private string PlayerDisplayName;
+
     void Awake()
     {
         _instance = this;
-        AuthenticateWithPlayFab();
+        PlayFabLogin();
+        DontDestroyOnLoad(gameObject);
         //LB_EntryText = LB_EntryBar.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+    }
+
+    private void Start()
+    {
+        LB_RefreshBtn.onClick.AddListener(UpdateLeaderboardUI);
     }
 
 
@@ -33,12 +42,16 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    private void AuthenticateWithPlayFab()
+    private void PlayFabLogin()
     {
         var request = new LoginWithCustomIDRequest
         {
-            CustomId = SystemInfo.deviceUniqueIdentifier,
-            CreateAccount = true
+            CustomId = "Wael231",
+            CreateAccount = true,
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                GetPlayerProfile = true
+            } 
         };
 
         PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
@@ -48,47 +61,21 @@ public class LeaderboardManager : MonoBehaviour
     private void OnLoginSuccess(LoginResult result)
     {
         Debug.Log("Login successful!");
-        GetLeaderboard();
+        string name = null;
+        if (result.InfoResultPayload.PlayerProfile != null)
+        {
+            name = result.InfoResultPayload.PlayerProfile.DisplayName;
+            PlayerDisplayName = name;
+        }
+
+        if (name == null)
+            PlayerNameInputWindow.SetActive(true);
     }
 
 
     private void OnLoginFailure(PlayFabError error)
     {
         Debug.LogError("Login failed: " + error.GenerateErrorReport());
-    }
-
-
-    private void GetLeaderboard()
-    {
-        var request = new GetLeaderboardRequest
-        {
-            StatisticName = "LEVEL1_TIMES",
-            StartPosition = 0,
-            MaxResultsCount = 10
-        };
-
-        PlayFabClientAPI.GetLeaderboard(request, OnGetLeaderboardSuccess, OnGetLeaderboardFailure);
-    }
-
-
-    private void OnGetLeaderboardSuccess(GetLeaderboardResult result)
-    {
-        Debug.Log("Leaderboard retrieved successfully!");
-
-        foreach (var item in result.Leaderboard)
-        {
-            string playerName = item.DisplayName;
-            string levelTime = MillisecondsToTimeString(item.StatValue);
-            string country = "IL";
-
-            Debug.Log(playerName + " " + levelTime + " " + country);
-        }
-    }
-
-
-    private void OnGetLeaderboardFailure(PlayFabError error)
-    {
-        Debug.LogError("Failed to retrieve leaderboard: " + error.GenerateErrorReport());
     }
 
 
@@ -143,9 +130,18 @@ public class LeaderboardManager : MonoBehaviour
             {
                 var lbEntryBarObject = Instantiate(LB_EntryBar, LB_EntryParent);
 
+                //item.DisplayName = "asd";
                 string playerName = TruncateString(item.DisplayName);
                 int playerScore = (int)item.StatValue;
                 string country = "US"; // Automate
+                Debug.Log($"playername: {playerName} \n DisplayName: {PlayerDisplayName} ");
+                // highlight current player entry
+                if (item.DisplayName == PlayerDisplayName)
+                {
+                    Debug.Log($"playername: {playerName} \n DisplayName: {PlayerDisplayName} ");
+                    var entryHighlight = lbEntryBarObject.GetComponent<Image>();
+                    entryHighlight.color = new Color32(180, 180, 180, 130);
+                }
 
                 // Convert the score to the desired format 
                 string scoreString = FormatScore(playerScore);
@@ -164,6 +160,10 @@ public class LeaderboardManager : MonoBehaviour
 
     public void ResetLeaderboardEntries()
     {
+        if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay > Time.unscaledTime)
+            return;
+        GameManager.Instance._LastPressTime = Time.unscaledTime;
+
         // Destroy all instantiated LB_EntryBar objects
         foreach (Transform child in LB_EntryParent.transform)
         {
@@ -171,7 +171,21 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
+    public void OnPlayerSubmitName()
+    {
+        var request = new UpdateUserTitleDisplayNameRequest
+        {
+            DisplayName = PlayerNameInput.text,
+        };
+        PlayFabClientAPI.UpdateUserTitleDisplayName(request, OnDisplayNameUpdate, OnError);
+    }
 
+    void OnDisplayNameUpdate(UpdateUserTitleDisplayNameResult result)
+    {
+        Debug.Log("Updated player display name.");
+        PlayerDisplayName = result.DisplayName;
+        PlayerNameInputWindow.SetActive(false);
+    }
 
     private string FormatScore(int score)
     {
@@ -209,6 +223,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private string TruncateString(string str)
     {
+        if (str == null) { str = "null"; }
         if (str.Length > MaxPlayerNameLength)
             return str.Substring(0, MaxPlayerNameLength - 2) + "..";
         else

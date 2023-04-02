@@ -99,6 +99,11 @@ public class MenuController : MonoBehaviour
         TotalPointsText.text = "Total Points: " + PlayerPrefs.GetInt("PLAYER_TOTAL_POINTS_STATS", 0);
     }
 
+    public void ChangePlayerDisplayName()
+    {
+        LeaderboardManager.Instance.PlayerNameInputWindow.SetActive(true);
+    }
+
     public static MenuController Instance
     {
         get
@@ -122,12 +127,12 @@ public class MenuController : MonoBehaviour
 
         GameManager.Instance._LastPressTime = Time.unscaledTime;
         objView.SetActive(true);
-        LeanTween.scale(objView, new Vector3(1, 1, 1), 1.0f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f).setOnComplete(
+        LeanTween.scale(objView, new Vector3(1, 1, 1), 0.3f).setEase(LeanTweenType.easeInOutCirc).setDelay(0.2f).setOnComplete(
             delegate ()
             {
                
             });
-        LeanTween.scale(MenuView, new Vector3(0, 0, 0), 1.0f).setEase(LeanTweenType.easeOutElastic).setDelay(0.1f);
+        LeanTween.scale(MenuView, new Vector3(0, 0, 0), 1.0f).setEase(LeanTweenType.easeInOutCirc).setDelay(0.1f);
         StartCoroutine(ViewActiveToggle(MenuView));
     }
       

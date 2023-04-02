@@ -67,6 +67,7 @@ public class AudioController : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
 
+#if !UNITY_WEBGL
         if (useMicrophone)
         {
             if (Microphone.devices.Length > 0)
@@ -84,7 +85,7 @@ public class AudioController : MonoBehaviour
             audioSource.outputAudioMixerGroup = audioGroupMaster;
             audioSource.clip = audioClip;
         }
-
+#endif
         audioSource.Play();
 
         for (int i = 0; i < 8; i++) //Fills of zeros the max array
