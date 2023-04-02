@@ -17,16 +17,18 @@ public class GameLogic : MonoBehaviour
     [SerializeField] public GameObject PlayerBall;
     [SerializeField] public Rigidbody PlayerBallRB;
     [SerializeField] private float MovePower;
-    [SerializeField] private float MaxVelocity;
+    [SerializeField] private float CurrentPlayerBallMaxVelocity;
     [SerializeField] private float JumpPower;
     [SerializeField] private float _distToGround = 2f;
+    [SerializeField] private const float MinVelocity = 25f;
+    [SerializeField] private const float MaxVelocity = 120f;
     [SerializeField] public bool JumpEnabled { get; set; } = false;
     private float _lastClickTime;
     private float _catchTime = 0.25f; // Double tap for jump catch time
     private Vector3 _prevMousePosition;
     private Vector3 _prevPlayerVelocity;
     private bool _ghostMode = false;
-    private bool _cheatMode = false;
+    private bool _cheatMode = true;
 
     // Game HUD
     [Header("")]
@@ -191,7 +193,7 @@ public class GameLogic : MonoBehaviour
         // Show how to play animation
         // Quick 3s show controls (mobile / keyboard)
 
-        PlayerBallRB.maxAngularVelocity = MaxVelocity;
+        PlayerBallRB.maxAngularVelocity = CurrentPlayerBallMaxVelocity;
 
         // Load saved player stats
         PlayerHighscoreStats = PlayerPrefs.GetInt("PLAYER_HIGHSCORE_STATS", 0);
@@ -221,24 +223,86 @@ public class GameLogic : MonoBehaviour
         WinButtons[2].onClick.AddListener(RestartGame);
     }
 
+    // for Acc & Decceleration
+    private int frameCounter = 0;
+
     void FixedUpdate()
     {
+        frameCounter++;
         // Move player ball forward continously
-        MovePlayer(Vector3.forward, false);
+        MovePlayer(Vector3.forward, false, 1);
+
+        // Player Input Handling
+        if (Input.GetKeyDown(KeyCode.W) && JumpEnabled && IsGrounded())
+            MovePlayer(Vector3.forward, true, 1);
+
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            MovePlayer(Vector3.right, false, 1);
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+            MovePlayer(Vector3.left, false, 1);
+
+        if (frameCounter % 2 == 0)
+        {
+            if (Input.GetKey(KeyCode.UpArrow) && _cheatMode)
+            {
+                AddPlayerBallVelocity(1.5f);
+                MovePlayer(Vector3.forward, false, 1);
+            }
+        }
+
+        if (frameCounter % 2 == 0)
+        {
+            if (Input.GetKey(KeyCode.DownArrow) && _cheatMode)
+            {
+                AddPlayerBallVelocity(-1.5f);
+                MovePlayer(Vector3.forward, false, 1);
+            }
+        }
+
+        // Diagonal slowing
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) && Input.GetKey(KeyCode.DownArrow))
+        {
+            MovePlayer(Vector3.right, false, 0.1f);
+            AddPlayerBallVelocity(-1.5f);
+        }
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.DownArrow))
+        {
+            MovePlayer(Vector3.left, false, 0.1f);
+            AddPlayerBallVelocity(-1.5f);
+        }
+
+        // Mobile Input Handling
+        if (Input.GetMouseButtonDown(0) && Input.mousePosition.y < Screen.height * 0.75 && JumpEnabled)
+        {
+            // Checks if double tap was in the same position (<=20p)
+            if (Time.time - _lastClickTime < _catchTime
+                && Math.Abs(Input.mousePosition.x - _prevMousePosition.x) <= 20
+                && Math.Abs(Input.mousePosition.y - _prevMousePosition.y) <= 20)
+            {
+                MovePlayer(Vector3.forward, true, 1);
+                Debug.Log("Jump");
+            }
+            _lastClickTime = Time.time;
+            _prevMousePosition = Input.mousePosition;
+        }
+    }
+
+    void AddPlayerBallVelocity(float value)
+    {
+        if(PlayerBallRB.maxAngularVelocity < MinVelocity)
+            PlayerBallRB.maxAngularVelocity = MinVelocity;
+
+        if (PlayerBallRB.maxAngularVelocity > MaxVelocity)
+            PlayerBallRB.maxAngularVelocity = MaxVelocity;
+
+        if ((PlayerBallRB.maxAngularVelocity >= MinVelocity) && (PlayerBallRB.maxAngularVelocity <= MaxVelocity))
+            PlayerBallRB.maxAngularVelocity += value;
     }
 
     void Update()
     {
-
-        // Player Input Handling
-        if (Input.GetKeyDown(KeyCode.W) && JumpEnabled && IsGrounded())
-            MovePlayer(Vector3.forward, true);
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            MovePlayer(Vector3.right, false);
-
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            MovePlayer(Vector3.left, false);
 
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleGamePause(false);
@@ -252,39 +316,12 @@ public class GameLogic : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.T))
             _cheatMode = true;
 
-        if (Input.GetKey(KeyCode.LeftShift) && _cheatMode)
-        {
-            MovePlayer(Vector3.forward, false);
-            PlayerBallRB.maxAngularVelocity += 1;
-        }
-
-        if (Input.GetKey(KeyCode.DownArrow) && _cheatMode)
-        {
-            MovePlayer(Vector3.forward, false);
-            PlayerBallRB.maxAngularVelocity -= 6;
-        }
-
-        // Mobile Input Handling
-        if (Input.GetMouseButtonDown(0) && Input.mousePosition.y < Screen.height * 0.75 && JumpEnabled)
-        {
-            // Checks if double tap was in the same position (<=20p)
-            if (Time.time - _lastClickTime < _catchTime
-                && Math.Abs(Input.mousePosition.x - _prevMousePosition.x) <= 20
-                && Math.Abs(Input.mousePosition.y - _prevMousePosition.y) <= 20)
-            { 
-                MovePlayer(Vector3.forward, true);
-                Debug.Log("Jump");
-            }
-            _lastClickTime = Time.time;
-            _prevMousePosition = Input.mousePosition;
-        }
-
         if (Input.GetMouseButton(0))
         {
             if(Input.mousePosition.x > Screen.width / 2 && Input.mousePosition.y < Screen.height * 0.75 ) // Touch boundaries (to be able to click pause btn)
-                MovePlayer(Vector3.right, false);
+                MovePlayer(Vector3.right, false, 1);
             else if(Input.mousePosition.x < Screen.width / 2 && Input.mousePosition.y < Screen.height * 0.75)
-                MovePlayer(Vector3.left, false);
+                MovePlayer(Vector3.left, false, 1);
         }
 
         // Timer
@@ -358,11 +395,11 @@ public class GameLogic : MonoBehaviour
             return false;
     }
 
-    public void MovePlayer(Vector3 moveDirection, bool jump)
+    public void MovePlayer(Vector3 moveDirection, bool jump, float multiplier)
     {
         if (jump)
             PlayerBallRB.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-        PlayerBallRB.AddTorque(new Vector3(moveDirection.z, 0, -moveDirection.x) * MovePower);
+        PlayerBallRB.AddTorque(new Vector3(moveDirection.z, 0, -moveDirection.x) * MovePower * multiplier);
     }
 
     void ToggleGamePause(bool gameOver)

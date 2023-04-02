@@ -15,7 +15,7 @@ public class LeaderboardManager : MonoBehaviour
     [SerializeField] private Button LB_RefreshBtn;
     [SerializeField] public GameObject PlayerNameInputWindow;
     [SerializeField] private TMPro.TextMeshProUGUI PlayerNameInput;
-    [SerializeField] private int MaxPlayerNameLength = 11;
+    [SerializeField] private int MaxPlayerNameLength = 18;
     private string PlayerDisplayName;
 
     void Awake()
@@ -28,7 +28,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private void Start()
     {
-        LB_RefreshBtn.onClick.AddListener(UpdateLeaderboardUI);
+        LB_RefreshBtn.onClick.AddListener(OnRefreshBtnClick);
     }
 
 
@@ -107,9 +107,19 @@ public class LeaderboardManager : MonoBehaviour
         Debug.Log("Sucessfull leaderboard sent.");
     }
 
+    void OnRefreshBtnClick()
+    {
+        if (GameManager.Instance._LastPressTime + GameManager.Instance._PressDelay + 2 > Time.unscaledTime)
+            return;
+        else
+            UpdateLeaderboardUI();
+        GameManager.Instance._LastPressTime = Time.unscaledTime;
+    }
+
 
     public void UpdateLeaderboardUI()
     {
+
         ResetLeaderboardEntries();
         var request = new GetLeaderboardRequest
         {
@@ -129,12 +139,13 @@ public class LeaderboardManager : MonoBehaviour
             foreach (var item in result.Leaderboard)
             {
                 var lbEntryBarObject = Instantiate(LB_EntryBar, LB_EntryParent);
+                TMPro.TextMeshProUGUI[] childTexts = lbEntryBarObject.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
 
-                //item.DisplayName = "asd";
                 string playerName = TruncateString(item.DisplayName);
                 int playerScore = (int)item.StatValue;
                 string country = "US"; // Automate
                 Debug.Log($"playername: {playerName} \n DisplayName: {PlayerDisplayName} ");
+
                 // highlight current player entry
                 if (item.DisplayName == PlayerDisplayName)
                 {
@@ -143,11 +154,33 @@ public class LeaderboardManager : MonoBehaviour
                     entryHighlight.color = new Color32(180, 180, 180, 130);
                 }
 
+                Debug.Log("Childs: " + childTexts.Length);
                 // Convert the score to the desired format 
                 string scoreString = FormatScore(playerScore);
 
-                var lbEntryText = lbEntryBarObject.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                lbEntryText.text = string.Format("<color=#fff000>{0}.</color> {1} (<color=#fff123>{2}</color>) - {3}", rank, playerName, scoreString, country);
+                // iterate over prefab text separately
+                int i = 0;
+                foreach (TMPro.TextMeshProUGUI child in childTexts)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            child.text = string.Format("<color=#fff000>{0}.</color> <size=100%>{1}</size><size=80%>{2}</size>", rank, playerName.Substring(0, 1), playerName.Substring(1));
+                            break;
+                        case 1:
+                            child.text = string.Format("<color=#ff0>(<color=#fff>{0}</color>:<color=#fff>{1}</color>:<color=#fff>{2}</color>)</color>", scoreString.Substring(0, 2), scoreString.Substring(3, 2), scoreString.Substring(6));
+                            break;
+                        case 2:
+                            child.text = country;
+                            break;
+                        default:
+                            break;
+                    }
+                    i++;
+                }
+
+                //var lbEntryText = lbEntryBarObject.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                //lbEntryText.text = string.Format("<color=#fff000>{0}.</color> {1} (<color=#fff123>{2}</color>) - {3}", rank, playerName, scoreString, country);
 
                 rank++;
             }
