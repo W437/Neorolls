@@ -144,17 +144,14 @@ public class LeaderboardManager : MonoBehaviour
                 string playerName = TruncateString(item.DisplayName);
                 int playerScore = (int)item.StatValue;
                 string country = "US"; // Automate
-                Debug.Log($"playername: {playerName} \n DisplayName: {PlayerDisplayName} ");
 
                 // highlight current player entry
                 if (item.DisplayName == PlayerDisplayName)
                 {
-                    Debug.Log($"playername: {playerName} \n DisplayName: {PlayerDisplayName} ");
                     var entryHighlight = lbEntryBarObject.GetComponent<Image>();
                     entryHighlight.color = new Color32(180, 180, 180, 130);
                 }
 
-                Debug.Log("Childs: " + childTexts.Length);
                 // Convert the score to the desired format 
                 string scoreString = FormatScore(playerScore);
 
