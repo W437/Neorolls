@@ -46,7 +46,7 @@ public class LeaderboardManager : MonoBehaviour
     {
         var request = new LoginWithCustomIDRequest
         {
-            CustomId = "Wael231",
+            CustomId = SystemInfo.deviceUniqueIdentifier,
             CreateAccount = true,
             InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
             {
@@ -119,7 +119,6 @@ public class LeaderboardManager : MonoBehaviour
 
     public void UpdateLeaderboardUI()
     {
-
         ResetLeaderboardEntries();
         var request = new GetLeaderboardRequest
         {
@@ -143,7 +142,7 @@ public class LeaderboardManager : MonoBehaviour
 
                 string playerName = TruncateString(item.DisplayName);
                 int playerScore = (int)item.StatValue;
-                string country = "US"; // Automate
+                string country = "IL"; // Automate
 
                 // highlight current player entry
                 if (item.DisplayName == PlayerDisplayName)
@@ -164,21 +163,20 @@ public class LeaderboardManager : MonoBehaviour
                         case 0:
                             child.text = string.Format("<color=#fff000>{0}.</color> <size=100%>{1}</size><size=80%>{2}</size>", rank, playerName.Substring(0, 1), playerName.Substring(1));
                             break;
+
                         case 1:
                             child.text = string.Format("<color=#ff0>(<color=#fff>{0}</color>:<color=#fff>{1}</color>:<color=#fff>{2}</color>)</color>", scoreString.Substring(0, 2), scoreString.Substring(3, 2), scoreString.Substring(6));
                             break;
+
                         case 2:
                             child.text = country;
                             break;
+
                         default:
                             break;
                     }
                     i++;
                 }
-
-                //var lbEntryText = lbEntryBarObject.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                //lbEntryText.text = string.Format("<color=#fff000>{0}.</color> {1} (<color=#fff123>{2}</color>) - {3}", rank, playerName, scoreString, country);
-
                 rank++;
             }
         }, error =>
