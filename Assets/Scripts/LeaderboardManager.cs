@@ -6,6 +6,7 @@ using PlayFab.EconomyModels;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
 using System;
+using Unity.Mathematics;
 
 public class LeaderboardManager : MonoBehaviour
 { 
@@ -16,12 +17,12 @@ public class LeaderboardManager : MonoBehaviour
     [SerializeField] public GameObject PlayerNameInputWindow;
     [SerializeField] private TMPro.TextMeshProUGUI PlayerNameInput;
     [SerializeField] private int MaxPlayerNameLength = 18;
-    private string PlayerDisplayName;
+    private static string PlayerDisplayName;
 
     void Awake()
     {
         _instance = this;
-        PlayFabLogin();
+        PlayFabLogin(SystemInfo.deviceUniqueIdentifier);
         DontDestroyOnLoad(gameObject);
         //LB_EntryText = LB_EntryBar.GetComponentInChildren<TMPro.TextMeshProUGUI>();
     }
@@ -42,11 +43,11 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    private void PlayFabLogin()
+    private void PlayFabLogin(string id)
     {
         var request = new LoginWithCustomIDRequest
         {
-            CustomId = SystemInfo.deviceUniqueIdentifier,
+            CustomId = id,
             CreateAccount = true,
             InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
             {
@@ -55,6 +56,18 @@ public class LeaderboardManager : MonoBehaviour
         };
 
         PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
+    }
+
+    public void ResetPlayFabLoginID()
+    {
+        string newId = "id";
+        for (int i = 0; i < 10; i++)
+        {
+            newId += (char)UnityEngine.Random.Range(97, 122);
+        }
+
+        Debug.Log(newId);
+        PlayFabLogin(newId);
     }
 
 
@@ -133,7 +146,6 @@ public class LeaderboardManager : MonoBehaviour
             result.Leaderboard.Reverse();
 
             int rank = 1;
-
             // Loop through the leaderboard data and add it to the UI
             foreach (var item in result.Leaderboard)
             {
@@ -147,6 +159,7 @@ public class LeaderboardManager : MonoBehaviour
                 // highlight current player entry
                 if (item.DisplayName == PlayerDisplayName)
                 {
+                    Debug.Log("inside display: " + PlayerDisplayName);
                     var entryHighlight = lbEntryBarObject.GetComponent<Image>();
                     entryHighlight.color = new Color32(180, 180, 180, 130);
                 }
@@ -203,17 +216,18 @@ public class LeaderboardManager : MonoBehaviour
     {
         var request = new UpdateUserTitleDisplayNameRequest
         {
-            DisplayName = PlayerNameInput.text,
+            DisplayName = PlayerNameInput.text
         };
         PlayFabClientAPI.UpdateUserTitleDisplayName(request, OnDisplayNameUpdate, OnError);
     }
 
     void OnDisplayNameUpdate(UpdateUserTitleDisplayNameResult result)
     {
-        Debug.Log("Updated player display name.");
         PlayerDisplayName = result.DisplayName;
+        Debug.Log("changed display: " + PlayerDisplayName);
         PlayerNameInputWindow.SetActive(false);
     }
+    
 
     private string FormatScore(int score)
     {

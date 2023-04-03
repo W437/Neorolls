@@ -45,8 +45,10 @@ public class MenuController : MonoBehaviour
 
     void Start()
     {
-        // Set initial Leaderboard position
+        // Set initial UI pos/scale before tween
         LeaderboardView.transform.localScale = new Vector3(0, 0, 0);
+        SettingsView.transform.localScale = new Vector3(0, 0, 0);
+        AboutView.transform.localScale = new Vector3(0, 0, 0);
 
 
         // Load Settings
