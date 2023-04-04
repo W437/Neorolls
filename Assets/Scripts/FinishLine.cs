@@ -64,7 +64,9 @@ public class FinishLine : MonoBehaviour
             {
                 GameLogic.Instance.OnLevelFinish();
                 var timeString = GameLogic.Instance.GetLevelFinishTimeInString();
-                LeaderboardManager.Instance.SendLeaderboard(timeString);
+                var points = GameLogic.Instance.PlayerPillsStats;
+                LeaderboardManager.Instance.SendLeaderboardTime(timeString, LeaderboardManager.LB_Level1);
+                LeaderboardManager.Instance.SendLeaderboardPoints(points, LeaderboardManager.LB_Level1_Points);
                 collided = true;            
             }
         }
