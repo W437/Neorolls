@@ -2,15 +2,9 @@ using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
 using System.Collections.Generic;
-using PlayFab.EconomyModels;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
 using System;
-using Unity.Mathematics;
-using static UnityEditor.FilePathAttribute;
-using static UnityEngine.Networking.UnityWebRequest;
-using PlayFab.CloudScriptModels;
-using System.IO;
 using System.Linq;
 
 public class LeaderboardManager : MonoBehaviour

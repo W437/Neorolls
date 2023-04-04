@@ -21,6 +21,9 @@ public class GameLogic : MonoBehaviour
     [SerializeField] private float _distToGround = 2f;
     [SerializeField] private const float MinVelocity = 25f;
     [SerializeField] private const float MaxVelocity = 120f;
+    private bool playerMoving = true;
+
+
     [SerializeField] public bool JumpEnabled { get; set; } = false;
     private float _lastClickTime;
     private float _catchTime = 0.25f; // Double tap for jump catch time
@@ -228,18 +231,20 @@ public class GameLogic : MonoBehaviour
     void FixedUpdate()
     {
         frameCounter++;
-        // Move player ball forward continously
-        MovePlayer(Vector3.forward, false, 1);
+
+        if(playerMoving)
+            MovePlayer(Vector3.forward, false, 1);
 
         // Player Input Handling
         if (Input.GetKeyDown(KeyCode.W) && JumpEnabled && IsGrounded())
             MovePlayer(Vector3.forward, true, 1);
-
+        
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             MovePlayer(Vector3.right, false, 1);
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             MovePlayer(Vector3.left, false, 1);
+
 
         if (frameCounter % 2 == 0)
         {
@@ -300,8 +305,22 @@ public class GameLogic : MonoBehaviour
             PlayerBallRB.maxAngularVelocity += value;
     }
 
+    void RegulateSpeed()
+    {
+        if (PlayerBallRB.angularVelocity.z > PlayerBallRB.maxAngularVelocity)
+        {
+            playerMoving = false;
+        }
+        if (PlayerBallRB.angularVelocity.z < PlayerBallRB.maxAngularVelocity)
+        {
+            playerMoving = true;
+        }
+    }
+
+
     void Update()
     {
+        RegulateSpeed();
 
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleGamePause(false);
@@ -315,12 +334,31 @@ public class GameLogic : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.T))
             _cheatMode = true;
 
+
         if (Input.GetMouseButton(0))
         {
             if(Input.mousePosition.x > Screen.width / 2 && Input.mousePosition.y < Screen.height * 0.75 ) // Touch boundaries (to be able to click pause btn)
                 MovePlayer(Vector3.right, false, 1);
             else if(Input.mousePosition.x < Screen.width / 2 && Input.mousePosition.y < Screen.height * 0.75)
                 MovePlayer(Vector3.left, false, 1);
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if (Input.mousePosition.x > Screen.width / 2 && Input.mousePosition.y > Screen.height * 0.75)
+            {
+                AddPlayerBallVelocity(1);
+                Debug.Log("SpeedUp");
+            }
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if (Input.mousePosition.x < Screen.width / 2 && Input.mousePosition.y > Screen.height * 0.75)
+            {
+                AddPlayerBallVelocity(-1);
+                Debug.Log("SlowUp");
+            }
         }
 
         // Timer
@@ -398,7 +436,8 @@ public class GameLogic : MonoBehaviour
     {
         if (jump)
             PlayerBallRB.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-        PlayerBallRB.AddTorque(new Vector3(moveDirection.z, 0, -moveDirection.x) * MovePower * multiplier);
+        else
+            PlayerBallRB.AddTorque(new Vector3(moveDirection.z, 0, -moveDirection.x) * MovePower * multiplier);
     }
 
     void ToggleGamePause(bool gameOver)
@@ -493,10 +532,6 @@ public class GameLogic : MonoBehaviour
     {
         if (!GameIsOver)
         {
-            // Show leaderboard data
-
-            LeaderboardPanel.SetActive(true);
-
             GameIsOver = true;
             GameManager.Instance.PitchMusic(GameMusic);
             PlayerDistanceStats += PlayerBallRB.position.z / 2000f; // to km?
